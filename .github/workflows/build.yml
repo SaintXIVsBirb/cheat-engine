@@ -2,6 +2,9 @@ name: Build Clean CE
 on: 
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: windows-latest
@@ -10,16 +13,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Lazarus
-        uses: gcarreno/setup-lazarus@v3
+        uses: gcarreno/setup-lazarus@v3.3.1
         with:
-          lazarus-version: 'stable' # Automatically picks the latest 2026 stable version
+          lazarus-version: '2.2.6'
+
+      - name: Check Build Modes
+        run: lazbuild --list-build-modes "Cheat Engine\cheatengine.lpi"
 
       - name: Compile Cheat Engine (64-bit)
-        run: |
-          lazbuild --build-mode="Release x86_64" cheatengine.lpi
-          
+        run: lazbuild -B --cpu=x86_64 --os=win64 "Cheat Engine\cheatengine.lpi"
+        
       - name: Upload Clean Binary
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: Cheat-Engine-Clean-x64
-          path: bin/
+          name: Cheat-Engine-Binaries
+          path: "Cheat Engine/bin/"
