@@ -1,0 +1,26 @@
+name: Build Clean CE
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Lazarus
+        uses: gcarreno/setup-lazarus@v3.2.17
+        with:
+          lazarus-version: '2.2.2'
+          with-cross-i386-win32: true
+
+      - name: Compile Cheat Engine (64-bit)
+        run: |
+          lazbuild --build-mode="Release x86_64" cheatengine.lpi
+          
+      - name: Upload Clean Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cheat-Engine-Clean-x64
+          path: bin/
